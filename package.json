@@ -26,7 +26,9 @@
     },
     "requires": {
       "db": "hana",
-      "auth": "mocked"
+      "auth": "mocked",
+      "destinations": true,
+      "connectivity": true
     },
     "hana": {
       "deploy-format": "hdbtable"
