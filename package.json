@@ -1,0 +1,49 @@
+{
+  "name": "REGISTRATION_APP",
+  "version": "1.0.0",
+  "dependencies": {
+    "@cap-js/hana": "^2.3.4",
+    "@cap-js/sqlite": "^2.0.4",
+    "@sap-cloud-sdk/connectivity": "^4.2.0",
+    "@sap-cloud-sdk/http-client": "^4.2.0",
+    "@sap-cloud-sdk/resilience": "^4.2.0",
+    "@sap/cds": "^9.4.4",
+    "@sap/xssec": "^4.11.2",
+    "nodemailer": "^7.0.11"
+  },
+  "devDependencies": {
+    "@cap-js/cds-test": "^0.4.1",
+    "@sap/cds-dk": "^9.4.3",
+    "@sap/hdi-deploy": "^5.5.1",
+    "@sap/ux-specification": "^1.139.0",
+    "cds-plugin-ui5": "^0.13.0",
+    "mbt": "^1.2.29",
+    "rimraf": "^6.1.0"
+  },
+  "cds": {
+    "server": {
+      "index": true
+    },
+    "requires": {
+      "db": "hana",
+      "auth": "mocked"
+    },
+    "hana": {
+      "deploy-format": "hdbtable"
+    }
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "watch-registrationlr": "cds watch --open registrationlr/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "undeploy": "cf undeploy REGISTRATION_APP --delete-services --delete-service-keys --delete-service-brokers",
+    "build": "rimraf resources mta_archives && mbt build --mtar archive",
+    "deploy": "cf deploy mta_archives/archive.mtar --retries 1"
+  },
+  "private": true,
+  "workspaces": [
+    "app/*"
+  ],
+  "sapux": [
+    "app/registrationlr"
+  ]
+}

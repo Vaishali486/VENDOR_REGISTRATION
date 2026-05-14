@@ -1,0 +1,28 @@
+{
+  "xsappname": "registration_app",
+  "tenant-mode": "dedicated",
+  "description": "Security profile of called application",
+  "scopes": [
+    {
+      "name": "uaa.user",
+      "description": "UAA"
+    }
+  ],
+  "role-templates": [
+    {
+      "name": "Token_Exchange",
+      "description": "UAA",
+      "scope-references": [
+        "uaa.user"
+      ]
+    }
+  ],
+  "oauth2-configuration": {
+    "redirect-uris": [
+      "http://localhost:5000/",
+      "https://port5000-workspaces-ws-jwjwz.us10.trial.applicationstudio.cloud.sap/",
+      "https://f632d504trial-dev-registration-app-srv.cfapps.us10-001.hana.ondemand.com/",    
+      "https://f632d504trial-dev-registration-app.cfapps.us10-001.hana.ondemand.com//"      
+    ]
+  }
+}
