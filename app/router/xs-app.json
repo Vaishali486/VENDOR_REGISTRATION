@@ -6,6 +6,13 @@
   },
   "routes": [
     {
+      "source": "^/odata/(.*)$",
+      "target": "/odata/$1",
+      "destination": "srv-api",
+      "authenticationType": "none",
+      "csrfProtection": false
+    },
+    {
       "source": "^/app/(.*)$",
       "target": "$1",
       "localDir": ".",
@@ -23,10 +30,9 @@
       "service": "sap-approuter-userapi"
     },
     {
-      "source": "^/(.*)$",
+      "source": "^(.*)$",
       "target": "$1",
-      "destination": "srv-api",
-      "csrfProtection": true,
+      "service": "html5-apps-repo-rt",
       "authenticationType": "none"
     }
   ],

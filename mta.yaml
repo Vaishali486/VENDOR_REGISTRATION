@@ -2,6 +2,7 @@ _schema-version: 3.3.0
 ID: REGISTRATION_APP
 description: A simple CAP project.
 version: 1.0.0
+
 modules:
   - name: REGISTRATION_APP-srv
     type: nodejs
@@ -20,6 +21,7 @@ modules:
       memory: 500M
     build-parameters:
       builder: npm-ci
+
   - name: REGISTRATION_APP-db-deployer
     type: hdb
     path: gen/db
@@ -28,6 +30,7 @@ modules:
     parameters:
       buildpack: nodejs_buildpack
       memory: 500M
+
   - name: REGISTRATION_APP
     type: approuter.nodejs
     path: app/router
@@ -38,21 +41,27 @@ modules:
           forwardAuthToken: true
           name: srv-api
           url: ~{srv-url}
+
       - name: REGISTRATION_APP-destination-service
         group: destinations
         properties:
           forwardAuthToken: false
           name: ui5
           url: https://ui5.sap.com
+
+      - name: REGISTRATION_APP_html_repo_runtime
+
     provides:
       - name: app-api
         properties:
           app-protocol: ${protocol}
           app-uri: ${default-uri}
+
     parameters:
       disk-quota: 256M
       keep-existing-routes: true
       memory: 256M
+
   - name: REGISTRATION_APP-app-content
     type: com.sap.application.content
     path: .
@@ -60,16 +69,19 @@ modules:
       - name: REGISTRATION_APP_html_repo_host
         parameters:
           content-target: true
+
     build-parameters:
       build-result: resources
       requires:
-        - artifacts:
+        - name: registrationlr
+          artifacts:
             - registrationlr.zip
-          name: registrationlr
           target-path: resources/
+
   - name: registrationlr
     type: html5
     path: app/registrationlr
+
     build-parameters:
       build-result: dist
       builder: custom
@@ -78,52 +90,73 @@ modules:
         - npm run build:cf
       supported-platforms:
         []
+
 resources:
   - name: REGISTRATION_APP-db
     type: com.sap.xs.hdi-container
     parameters:
       service: hana
       service-plan: hdi-shared
+
+  # HTML5 App Host Service
   - name: REGISTRATION_APP_html_repo_host
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
       service-plan: app-host
-  - name: REGISTRATION_APP-destination-service
+
+  # HTML5 Runtime Service
+  - name: REGISTRATION_APP_html_repo_runtime
     type: org.cloudfoundry.managed-service
     parameters:
-      config:
-        HTML5Runtime_enabled: false
-        init_data:
-          instance:
-            destinations:
-              - Authentication: NoAuthentication
-                Name: ui5
-                ProxyType: Internet
-                Type: HTTP
-                URL: https://ui5.sap.com
-              - Authentication: NoAuthentication
-                HTML5.DynamicDestination: true
-                HTML5.ForwardAuthToken: true
-                Name: srv-api
-                ProxyType: Internet
-                Type: HTTP
-                URL: ~{srv-api/srv-url}
-            existing_destinations_policy: update
-        version: 1.0.0
+      service: html5-apps-repo
+      service-plan: app-runtime
+
+  - name: REGISTRATION_APP-destination-service
+    type: org.cloudfoundry.managed-service
+
+    parameters:
       service: destination
       service-name: REGISTRATION_APP-destination-service
       service-plan: lite
+
+      config:
+        HTML5Runtime_enabled: true
+
+        init_data:
+          instance:
+            existing_destinations_policy: update
+
+            destinations:
+              - Name: ui5
+                URL: https://ui5.sap.com
+                Type: HTTP
+                ProxyType: Internet
+                Authentication: NoAuthentication
+
+              - Name: srv-api
+                URL: ~{srv-api/srv-url}
+                Type: HTTP
+                ProxyType: Internet
+                Authentication: NoAuthentication
+                HTML5.DynamicDestination: true
+                HTML5.ForwardAuthToken: true
+
+        version: 1.0.0
+
     requires:
       - name: srv-api
+
   - name: REGISTRATION_APP-connectivity
     type: org.cloudfoundry.managed-service
     parameters:
       service: connectivity
       service-plan: lite
+
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true
+
 build-parameters:
   before-all:
     - builder: custom
